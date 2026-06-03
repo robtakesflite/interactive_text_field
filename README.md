@@ -11,9 +11,10 @@ and live "iMessage" effects in any combination.
 - **Plugin-based.** Decoration is contributed by independent
   `InteractiveTextPlugin`s. The controller merges them by priority into a
   single `TextSpan` tree — order-independent, override-able, composable.
-- **Syntax highlighting** for 180+ languages via the
-  [`highlight`](https://pub.dev/packages/highlight) package: Dart, SQL,
-  Python, Rust, HTML, JSON, YAML, Bash, …
+- **Syntax highlighting** for 13 hand-tuned grammars (Dart, JavaScript,
+  TypeScript, Python, Rust, Go, SQL, HTML, CSS, JSON, YAML, Bash,
+  Markdown). No transitive dependencies — register your own [`Grammar`]
+  for anything else.
 - **Inline markdown** styling without rendering a parallel widget tree —
   `**bold**`, `_italic_`, `` `code` ``, `[links](url)`, headings, lists,
   blockquotes. Delimiters dim so syntax stays visible, not noisy.
@@ -88,8 +89,10 @@ RegexHighlightPlugin(rules: [
 
 ### `SyntaxHighlightPlugin`
 
-180+ languages via `highlight`. Two themes shipped (`githubLight`,
-`vsCodeDark`); themes are just `Map<String, TextStyle>`, so build your own.
+13 built-in grammars (Dart, JavaScript/TypeScript, Python, Rust, Go,
+SQL, HTML, CSS, JSON, YAML, Bash, Markdown). Two themes shipped
+(`githubLight`, `vsCodeDark`); themes are just `Map<String, TextStyle>`,
+so build your own. Register a custom `Grammar` to extend the registry.
 
 ```dart
 SyntaxHighlightPlugin(

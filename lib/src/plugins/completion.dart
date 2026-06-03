@@ -305,12 +305,9 @@ class CompletionPlugin extends InteractiveTextPlugin {
     return KeyEventResult.ignored;
   }
 
-  @override
-  DecorationResult decorate(DecorationContext ctx) {
-    final cand = currentCandidate;
-    if (cand == null) return const DecorationResult.empty();
-    return const DecorationResult.empty();
-  }
+  // Inline completion is rendered via [buildOverlay] as ghost text, not as
+  // a styled range over the editor's own buffer. No decoration ranges
+  // contributed.
 
   @override
   Widget? buildOverlay(BuildContext context) {

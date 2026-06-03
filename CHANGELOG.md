@@ -12,8 +12,10 @@ Initial release.
 * Plugins:
   * `RegexHighlightPlugin` with `CommonRegexRules` (URL, email, hashtag,
     mention).
-  * `SyntaxHighlightPlugin` for 180+ languages via the `highlight`
-    package, with `githubLight` / `vsCodeDark` themes.
+  * `SyntaxHighlightPlugin` with 13 hand-tuned built-in grammars
+    (Dart, JavaScript, TypeScript, Python, Rust, Go, SQL, HTML, CSS,
+    JSON, YAML, Bash, Markdown) and `githubLight` / `vsCodeDark`
+    themes. Extensible via `GrammarRegistry.register`.
   * `MarkdownPlugin` for inline bold/italic/code/strike/link/heading/
     blockquote/list styling with dimmed delimiters.
   * `TriggerPlugin<T>` base for `/` and `@` style commands, with popup

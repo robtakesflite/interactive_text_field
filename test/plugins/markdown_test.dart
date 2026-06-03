@@ -66,5 +66,25 @@ void main() {
     test('empty text', () {
       expect(plugin.decorate(_ctx('')).ranges, isEmpty);
     });
+
+    test('unclosed fenced code block covers body to end of text', () {
+      // Regression: previously, an unclosed fence dropped the last char
+      // of the body because the close-detection branch always subtracted 1.
+      const text = '```dart\nlet x = 1';
+      final result = plugin.decorate(_ctx(text));
+      final codeBlock =
+          result.ranges.firstWhere((r) => r.data == 'code_block');
+      expect(codeBlock.start, 8); // after "```dart\n"
+      expect(codeBlock.end, text.length); // through last char "1"
+    });
+
+    test('closed fenced code block excludes the trailing newline + fence',
+        () {
+      const text = '```\nbody\n```';
+      final result = plugin.decorate(_ctx(text));
+      final codeBlock =
+          result.ranges.firstWhere((r) => r.data == 'code_block');
+      expect(text.substring(codeBlock.start, codeBlock.end), 'body');
+    });
   });
 }

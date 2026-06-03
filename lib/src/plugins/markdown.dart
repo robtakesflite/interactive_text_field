@@ -225,16 +225,20 @@ class MarkdownPlugin extends InteractiveTextPlugin {
       final fenceOpenStart = m.start;
       final fenceOpenEnd = m.start + 3 + lang.length;
       final bodyStart = text.indexOf('\n', fenceOpenStart) + 1;
+      final bool closed =
+          m.end - m.start >= 3 && text.substring(m.end - 3, m.end) == '```';
       int fenceCloseStart;
       int fenceCloseEnd;
-      if (text.substring(m.end - 3, m.end) == '```') {
+      if (closed) {
         fenceCloseStart = m.end - 3;
         fenceCloseEnd = m.end;
       } else {
         fenceCloseStart = m.end;
         fenceCloseEnd = m.end;
       }
-      final bodyEnd = fenceCloseStart > 0 ? fenceCloseStart - 1 : m.end;
+      // When closed, the `\n` immediately before the closing fence is a
+      // separator, not body. When unclosed, the body extends to EOF.
+      final bodyEnd = closed ? fenceCloseStart - 1 : m.end;
 
       addRange(
         bodyStart,
