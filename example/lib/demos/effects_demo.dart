@@ -17,7 +17,6 @@ class _EffectsDemoState extends State<EffectsDemo> {
     _controller = InteractiveTextController(
       plugins: [
         EffectsPlugin(
-          baseStyleResolver: Effects.iMessageScale(),
           effects: [
             Effects.shouting(),
             Effects.emojiPop(),
@@ -25,7 +24,7 @@ class _EffectsDemoState extends State<EffectsDemo> {
           ],
         ),
       ],
-      text: 'Hi!',
+      text: 'Type WOW or 42 or 🎉 to see effects fire.',
     );
   }
 
@@ -43,13 +42,14 @@ class _EffectsDemoState extends State<EffectsDemo> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const Text(
-            'iMessage-style live effects:\n'
-            '• Short messages grow big.\n'
-            '• Single-emoji messages get larger.\n'
-            '• ALL-CAPS words bold up.\n'
-            '• Numbers tint blue.\n\n'
-            'Try typing "Hi!", then a long sentence,\n'
-            'then just an emoji.',
+            'Per-pattern live effects — only matched ranges\n'
+            'animate, and only with paint-only properties so\n'
+            'the surrounding sentence never reflows:\n\n'
+            '• ALL-CAPS → bold red, color pulses red↔coral.\n'
+            '• Emoji → soft shadow, breathes 0.25↔0.75.\n'
+            '• Numbers → bold blue, no pulse (static).\n\n'
+            'Type WOW or 🎉 and watch only those words\n'
+            'pulse — the rest of the line stays put.',
             style: TextStyle(color: Color(0xFF666666)),
           ),
           const SizedBox(height: 16),

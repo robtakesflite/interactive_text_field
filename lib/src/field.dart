@@ -58,8 +58,8 @@ class InteractiveTextField extends StatefulWidget {
     this.decoration,
     this.padding = EdgeInsets.zero,
     this.locale,
-    this.baseStyleAnimationDuration = const Duration(milliseconds: 260),
-    this.baseStyleAnimationCurve = Curves.easeOutBack,
+    this.baseStyleAnimationDuration = const Duration(milliseconds: 220),
+    this.baseStyleAnimationCurve = Curves.easeOutCubic,
   });
 
   final InteractiveTextController controller;
