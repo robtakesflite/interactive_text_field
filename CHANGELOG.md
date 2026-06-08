@@ -1,3 +1,43 @@
+## 0.1.1
+
+* **New theme adapters.** `MaterialInteractiveTextField` (import
+  `package:interactive_text_field/material.dart`) and
+  `CupertinoInteractiveTextField` (import
+  `package:interactive_text_field/cupertino.dart`) resolve cursor /
+  selection / text style / context menu / selection handles from the
+  ambient `ThemeData` or `CupertinoThemeData`. The core library remains
+  Material/Cupertino-free; the guard test (`no_material_test.dart`) now
+  whitelists the two adapter source files.
+* **EffectsPlugin per-range animation.** Pattern matches now animate via
+  paint-only properties (color alpha, shadow alpha/blur/offset) — never
+  `fontSize`/`fontWeight`/`letterSpacing`, so the surrounding line
+  doesn't reflow during animation. New `PatternEffect.appearDuration`
+  controls the fade-in; new `PulseEffect` (`colorMin`/`colorMax`,
+  `shadowOpacityMin`/`shadowOpacityMax`) drives optional continuous
+  pulses. While any range is animating, the plugin ticks itself at
+  ~60 fps via a `Timer` and stops when all ranges settle.
+* **`Effects.iMessageScale`** rewritten as a 4-tier step function
+  (huge / large / medium / normal) so the field's `TweenAnimationBuilder`
+  actually animates at each crossing instead of per-character smoothing.
+* **`Effects` preset signature changes** — `shouting` / `emojiPop` /
+  `numbers` now take optional `appearDuration` + `pulse`. The matched
+  style no longer overrides `fontSize` (avoiding the "whole sentence
+  wiggles" issue).
+* **`InteractiveTextField` animation defaults** — `baseStyleAnimationCurve`
+  is now `Curves.easeOutCubic` (was `easeOutBack`, which overshoots) and
+  `baseStyleAnimationDuration` is now `220ms` (was `260ms`).
+
+### Bug fixes
+
+* `MarkdownPlugin` — unclosed fenced code blocks now include their final
+  character. Previously, when a fence block ended at end-of-text without
+  a separator newline (e.g. ``` ```\nbody``` ```), the body's last
+  character was dropped.
+* `CompletionPlugin._request` and `TriggerPlugin._resolve` now check
+  `isAttached` after every `await` and bump their generation counter on
+  `onDetach`, so a controller disposed mid-request no longer throws an
+  unhandled exception via the now-null `PluginContext`.
+
 ## 0.1.0
 
 Initial release.

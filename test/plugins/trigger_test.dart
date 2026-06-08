@@ -181,4 +181,30 @@ void main() {
       expect(controller.text, 'hi @rob ');
     });
   });
+
+  group('TriggerPlugin async safety', () {
+    testWidgets('disposing the controller mid-resolve does not throw',
+        (tester) async {
+      // Regression: `_resolve` would await the resolver and then access
+      // `context` even if the plugin had been detached.
+      final plugin = TriggerPlugin<String>(
+        trigger: '/',
+        resolver: (q) async {
+          await Future<void>.delayed(const Duration(milliseconds: 80));
+          return [
+            TriggerSuggestion(label: q.query, value: q.query),
+          ];
+        },
+        itemBuilder: (_, _, _) => const SizedBox.shrink(),
+      );
+      final controller = InteractiveTextController(plugins: [plugin]);
+      controller.text = '/h';
+      controller.selection = const TextSelection.collapsed(offset: 2);
+      await tester.pump(const Duration(milliseconds: 10));
+      controller.dispose();
+      // If the bug were still there, the resolver's continuation would
+      // throw asynchronously after the dispose.
+      await tester.pump(const Duration(milliseconds: 200));
+    });
+  });
 }

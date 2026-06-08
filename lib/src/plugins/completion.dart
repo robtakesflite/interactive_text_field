@@ -185,6 +185,7 @@ class CompletionPlugin extends InteractiveTextPlugin {
   }
 
   void _request() async {
+    if (!isAttached) return;
     final state = context.readEditorState();
     if (!state.selection.isValid || !state.selection.isCollapsed) {
       _clear();
@@ -201,7 +202,9 @@ class CompletionPlugin extends InteractiveTextPlugin {
       final result = await Future.value(provider.complete(
         CompletionRequest(text: state.text, cursor: cursor, prefix: prefix),
       ));
-      if (gen != _requestGeneration) return;
+      // After the await, the plugin may have been detached (controller
+      // disposed, route popped, hot reload). Guard every context access.
+      if (!isAttached || gen != _requestGeneration) return;
       final cur = context.readEditorState();
       if (cur.selection.extent.offset != cursor || cur.text != state.text) {
         return;
@@ -217,7 +220,7 @@ class CompletionPlugin extends InteractiveTextPlugin {
       _lastTextForCandidates = cur.text;
       context.requestOverlayRebuild();
     } catch (_) {
-      if (gen != _requestGeneration) return;
+      if (!isAttached || gen != _requestGeneration) return;
       _clear();
     }
   }
@@ -332,6 +335,10 @@ class CompletionPlugin extends InteractiveTextPlugin {
   @override
   void onDetach() {
     _debounceTimer?.cancel();
+    // Bumping the generation makes any in-flight `_request` bail at its
+    // post-await check instead of touching the now-null PluginContext.
+    _requestGeneration++;
+    _candidates = const [];
     super.onDetach();
   }
 }

@@ -86,5 +86,48 @@ void main() {
           result.ranges.firstWhere((r) => r.data == 'code_block');
       expect(text.substring(codeBlock.start, codeBlock.end), 'body');
     });
+
+    test('closed fenced code block with no separator newline keeps full body',
+        () {
+      // Regression: `m.end - 1` was subtracted unconditionally, which
+      // dropped the last body char when the close fence butted right up
+      // against the body (no separator `\n`).
+      const text = '```\nbody```';
+      final result = plugin.decorate(_ctx(text));
+      final codeBlock =
+          result.ranges.firstWhere((r) => r.data == 'code_block');
+      expect(text.substring(codeBlock.start, codeBlock.end), 'body');
+    });
+
+    test('viewer mode hides delimiters via near-zero font sizing', () {
+      final viewer = MarkdownPlugin(mode: MarkdownMode.viewer);
+      final ranges = viewer.decorate(_ctx('**bold**')).ranges;
+      final delim =
+          ranges.where((r) => r.data == 'delimiter').toList();
+      expect(delim, isNotEmpty);
+      for (final r in delim) {
+        // viewer-mode delimiter style: collapsed to zero pixels.
+        expect(r.style.fontSize, lessThan(1));
+      }
+    });
+
+    test('fenced code block with language tag emits syntax tokens', () {
+      // `class` is a Dart keyword, `Foo` is matched as a type, `1` as
+      // a number — verifies the fenced body is run through the Dart
+      // grammar registry.
+      const src = '```dart\nclass Foo { int x = 1; }\n```';
+      final ranges = plugin.decorate(_ctx(src)).ranges;
+      final tokens = ranges
+          .map((r) => r.data)
+          .where((d) =>
+              d is String &&
+              d != 'code_block' &&
+              d != 'fence_open' &&
+              d != 'fence_close' &&
+              d != 'delimiter')
+          .toSet();
+      expect(tokens, contains('keyword'));
+      expect(tokens, contains('number'));
+    });
   });
 }

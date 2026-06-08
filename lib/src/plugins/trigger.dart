@@ -270,12 +270,14 @@ class TriggerPlugin<T> extends InteractiveTextPlugin {
     final gen = ++_resolverGeneration;
     try {
       final result = await resolver(query);
-      if (gen != _resolverGeneration) return;
+      // After the await the plugin may have been detached. Guard every
+      // context access.
+      if (!isAttached || gen != _resolverGeneration) return;
       _suggestions = result;
       _selectedIndex = result.isEmpty ? 0 : _selectedIndex.clamp(0, result.length - 1);
       context.requestOverlayRebuild();
     } catch (_) {
-      if (gen != _resolverGeneration) return;
+      if (!isAttached || gen != _resolverGeneration) return;
       _suggestions = const [];
       context.requestOverlayRebuild();
     }
@@ -410,6 +412,16 @@ class TriggerPlugin<T> extends InteractiveTextPlugin {
         ),
       ),
     );
+  }
+
+  @override
+  void onDetach() {
+    // Bumping the generation makes any in-flight `_resolve` bail at its
+    // post-await check instead of touching the now-null PluginContext.
+    _resolverGeneration++;
+    _active = null;
+    _suggestions = const [];
+    super.onDetach();
   }
 }
 

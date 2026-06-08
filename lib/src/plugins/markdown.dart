@@ -237,8 +237,18 @@ class MarkdownPlugin extends InteractiveTextPlugin {
         fenceCloseEnd = m.end;
       }
       // When closed, the `\n` immediately before the closing fence is a
-      // separator, not body. When unclosed, the body extends to EOF.
-      final bodyEnd = closed ? fenceCloseStart - 1 : m.end;
+      // separator, not body. But the regex's `(?:\n```|$)` allows the
+      // close to match `$` directly (e.g. `"```\nbody```"` with no
+      // trailing newline before the close fence) — in that case there is
+      // no separator newline to exclude.
+      final int bodyEnd;
+      if (closed) {
+        final hasSeparatorNewline = fenceCloseStart > bodyStart &&
+            text.codeUnitAt(fenceCloseStart - 1) == 0x0A;
+        bodyEnd = hasSeparatorNewline ? fenceCloseStart - 1 : fenceCloseStart;
+      } else {
+        bodyEnd = m.end;
+      }
 
       addRange(
         bodyStart,

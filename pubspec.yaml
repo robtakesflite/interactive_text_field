@@ -1,6 +1,6 @@
 name: interactive_text_field
 description: "A modular, framework-agnostic interactive text field for Flutter with plugin-based syntax highlighting, markdown, slash/mention triggers, and code completion."
-version: 0.1.0
+version: 0.1.1
 homepage: https://github.com/robertmollentze/interactive_text_field
 repository: https://github.com/robertmollentze/interactive_text_field
 issue_tracker: https://github.com/robertmollentze/interactive_text_field/issues
