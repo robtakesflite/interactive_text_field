@@ -1,3 +1,33 @@
+## 0.1.2
+
+### Performance
+
+* `MarkdownPlugin.decorate` no longer re-runs the `_boldItalic` /
+  `_bold` regex once per other-emphasis match. Match lists are now
+  hoisted once and a linear containment check replaces the previous
+  O(N×M) `_overlapsRange`.
+
+### Bulletproofness
+
+* `InteractiveTextFieldState._handleFocusChange` now guards `setState`
+  with `mounted` — a focus listener could fire between `dispose`
+  removing the listener and Flutter dropping the pending notification.
+* `TriggerPlugin` now throws `ArgumentError` instead of `assert`ing when
+  given a non-single-character trigger, so the contract holds in
+  release builds.
+
+### Versatility
+
+* `MentionPlugin` query characters now accept any Unicode letter / digit
+  / underscore (`\p{L}\p{N}_`) instead of ASCII-only — handles in
+  non-Latin scripts (CJK, Cyrillic, Arabic, …) now work out of the box.
+* `InteractiveTextField` gained three optional pass-throughs:
+  `mouseCursor` (defaults to `SystemMouseCursors.text`),
+  `cursorOpacityAnimates`, and `forcePressEnabled` (default `true` to
+  preserve previous behavior). `MaterialInteractiveTextField` and
+  `CupertinoInteractiveTextField` forward all three; Cupertino defaults
+  `cursorOpacityAnimates: true` to match native iOS.
+
 ## 0.1.1
 
 * **New theme adapters.** `MaterialInteractiveTextField` (import

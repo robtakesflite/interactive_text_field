@@ -90,13 +90,14 @@ class MentionPlugin extends TriggerPlugin<Mention> {
         );
 }
 
+/// Unicode letter (`\p{L}`), number (`\p{N}`), or underscore — so mention
+/// handles work for non-Latin scripts (CJK, Cyrillic, Arabic, …) without
+/// the previous ASCII-only behavior.
+final RegExp _mentionQueryChar = RegExp(r'^[\p{L}\p{N}_]$', unicode: true);
+
 bool _isMentionQueryChar(String ch) {
   if (ch.isEmpty) return false;
-  final code = ch.codeUnitAt(0);
-  return (code >= 0x30 && code <= 0x39) || // 0-9
-      (code >= 0x41 && code <= 0x5A) || // A-Z
-      (code >= 0x61 && code <= 0x7A) || // a-z
-      code == 0x5F; // _
+  return _mentionQueryChar.hasMatch(ch);
 }
 
 class _MentionRow extends StatelessWidget {

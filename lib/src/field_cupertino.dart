@@ -57,6 +57,9 @@ class CupertinoInteractiveTextField extends StatelessWidget {
     this.locale,
     this.baseStyleAnimationDuration = const Duration(milliseconds: 220),
     this.baseStyleAnimationCurve = Curves.easeOutCubic,
+    this.mouseCursor,
+    this.cursorOpacityAnimates = true,
+    this.forcePressEnabled = true,
   });
 
   final InteractiveTextController controller;
@@ -103,6 +106,11 @@ class CupertinoInteractiveTextField extends StatelessWidget {
   final Locale? locale;
   final Duration baseStyleAnimationDuration;
   final Curve baseStyleAnimationCurve;
+  final MouseCursor? mouseCursor;
+
+  /// Cupertino defaults to `true` to match native iOS cursor blink.
+  final bool cursorOpacityAnimates;
+  final bool forcePressEnabled;
 
   static Widget _adaptiveContextMenu(
     BuildContext context,
@@ -169,6 +177,9 @@ class CupertinoInteractiveTextField extends StatelessWidget {
       locale: locale,
       baseStyleAnimationDuration: baseStyleAnimationDuration,
       baseStyleAnimationCurve: baseStyleAnimationCurve,
+      mouseCursor: mouseCursor,
+      cursorOpacityAnimates: cursorOpacityAnimates,
+      forcePressEnabled: forcePressEnabled,
     );
   }
 }

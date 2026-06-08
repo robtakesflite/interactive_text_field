@@ -64,6 +64,24 @@ void main() {
       expect(editable.style.color, textStyle.color);
     });
 
+    testWidgets('accepts typed text end-to-end', (tester) async {
+      final controller = InteractiveTextController();
+      addTearDown(controller.dispose);
+      await tester.pumpWidget(
+        CupertinoApp(
+          home: CupertinoPageScaffold(
+            child: CupertinoInteractiveTextField(
+              controller: controller,
+              autofocus: true,
+            ),
+          ),
+        ),
+      );
+      await tester.enterText(find.byType(EditableText), 'hello');
+      await tester.pump();
+      expect(controller.text, 'hello');
+    });
+
     testWidgets('uses Cupertino default cursor radius', (tester) async {
       final controller = InteractiveTextController(text: 'hello');
       addTearDown(controller.dispose);

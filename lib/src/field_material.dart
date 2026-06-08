@@ -57,6 +57,9 @@ class MaterialInteractiveTextField extends StatelessWidget {
     this.locale,
     this.baseStyleAnimationDuration = const Duration(milliseconds: 220),
     this.baseStyleAnimationCurve = Curves.easeOutCubic,
+    this.mouseCursor,
+    this.cursorOpacityAnimates = false,
+    this.forcePressEnabled = true,
   });
 
   final InteractiveTextController controller;
@@ -103,6 +106,9 @@ class MaterialInteractiveTextField extends StatelessWidget {
   final Locale? locale;
   final Duration baseStyleAnimationDuration;
   final Curve baseStyleAnimationCurve;
+  final MouseCursor? mouseCursor;
+  final bool cursorOpacityAnimates;
+  final bool forcePressEnabled;
 
   static Widget _adaptiveContextMenu(
     BuildContext context,
@@ -173,6 +179,9 @@ class MaterialInteractiveTextField extends StatelessWidget {
       locale: locale,
       baseStyleAnimationDuration: baseStyleAnimationDuration,
       baseStyleAnimationCurve: baseStyleAnimationCurve,
+      mouseCursor: mouseCursor,
+      cursorOpacityAnimates: cursorOpacityAnimates,
+      forcePressEnabled: forcePressEnabled,
     );
   }
 }

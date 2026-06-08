@@ -60,6 +60,9 @@ class InteractiveTextField extends StatefulWidget {
     this.locale,
     this.baseStyleAnimationDuration = const Duration(milliseconds: 220),
     this.baseStyleAnimationCurve = Curves.easeOutCubic,
+    this.mouseCursor,
+    this.cursorOpacityAnimates = false,
+    this.forcePressEnabled = true,
   });
 
   final InteractiveTextController controller;
@@ -112,6 +115,17 @@ class InteractiveTextField extends StatefulWidget {
   /// Curve for the base-style animation.
   final Curve baseStyleAnimationCurve;
 
+  /// Optional mouse cursor for the text region. When null the editor
+  /// uses the platform's default text cursor.
+  final MouseCursor? mouseCursor;
+
+  /// Whether the cursor blinks via an opacity animation. Off by default
+  /// to keep behavior identical to previous releases.
+  final bool cursorOpacityAnimates;
+
+  /// Whether the field reacts to force-press gestures (iOS/iPadOS).
+  final bool forcePressEnabled;
+
   @override
   State<InteractiveTextField> createState() => InteractiveTextFieldState();
 }
@@ -128,7 +142,7 @@ class InteractiveTextFieldState extends State<InteractiveTextField>
   GlobalKey<EditableTextState> get editableTextKey => _editableTextKey;
 
   @override
-  bool get forcePressEnabled => true;
+  bool get forcePressEnabled => widget.forcePressEnabled;
 
   @override
   bool get selectionEnabled =>
@@ -177,6 +191,10 @@ class InteractiveTextFieldState extends State<InteractiveTextField>
   }
 
   void _handleFocusChange() {
+    // Focus listeners can fire after `dispose` removed us but before the
+    // pending notification was dropped — guard against the post-dispose
+    // `setState` throw.
+    if (!mounted) return;
     final has = effectiveFocusNode.hasFocus;
     if (has != _hasFocus) {
       setState(() => _hasFocus = has);
@@ -276,6 +294,8 @@ class InteractiveTextFieldState extends State<InteractiveTextField>
                 locale: widget.locale,
                 rendererIgnoresPointer: true,
                 paintCursorAboveText: true,
+                cursorOpacityAnimates: widget.cursorOpacityAnimates,
+                mouseCursor: widget.mouseCursor ?? SystemMouseCursors.text,
               ),
             );
 

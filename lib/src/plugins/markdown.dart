@@ -344,23 +344,28 @@ class MarkdownPlugin extends InteractiveTextPlugin {
     }
 
     // 3) Inline
-    for (final m in _boldItalic.allMatches(text)) {
+    // Hoist the bold/bold-italic match lists once so the overlap checks
+    // below stay linear in the match count instead of re-running the
+    // regex for every other-emphasis match (was O(N×M)).
+    final boldItalicMatches = _boldItalic.allMatches(text).toList();
+    final boldMatches = _bold.allMatches(text).toList();
+    for (final m in boldItalicMatches) {
       if (insideFence(m.start, m.end)) continue;
       addRange(m.start, m.end, style.boldItalic, data: 'bold_italic', p: 3);
       addDelim(m.start, m.start + 3);
       addDelim(m.end - 3, m.end);
     }
-    for (final m in _bold.allMatches(text)) {
+    for (final m in boldMatches) {
       if (insideFence(m.start, m.end)) continue;
-      if (_overlapsRange(text, m, _boldItalic)) continue;
+      if (_containedIn(m, boldItalicMatches)) continue;
       addRange(m.start, m.end, style.bold, data: 'bold', p: 2);
       addDelim(m.start, m.start + 2);
       addDelim(m.end - 2, m.end);
     }
     for (final m in _italic.allMatches(text)) {
       if (insideFence(m.start, m.end)) continue;
-      if (_overlapsRange(text, m, _bold)) continue;
-      if (_overlapsRange(text, m, _boldItalic)) continue;
+      if (_containedIn(m, boldMatches)) continue;
+      if (_containedIn(m, boldItalicMatches)) continue;
       addRange(m.start, m.end, style.italic, data: 'italic', p: 1);
       addDelim(m.start, m.start + 1);
       addDelim(m.end - 1, m.end);
@@ -394,8 +399,10 @@ class MarkdownPlugin extends InteractiveTextPlugin {
     return DecorationResult(out);
   }
 
-  bool _overlapsRange(String text, Match a, RegExp other) {
-    for (final b in other.allMatches(text)) {
+  /// Whether [a] is fully contained within any match in [others].
+  /// Linear in `others.length`; the caller hoists `others` once.
+  bool _containedIn(Match a, List<Match> others) {
+    for (final b in others) {
       if (b.start <= a.start && b.end >= a.end) return true;
     }
     return false;

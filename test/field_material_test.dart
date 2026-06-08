@@ -69,6 +69,24 @@ void main() {
       expect(editable.cursorColor, cursor);
     });
 
+    testWidgets('accepts typed text end-to-end', (tester) async {
+      final controller = InteractiveTextController();
+      addTearDown(controller.dispose);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: MaterialInteractiveTextField(
+              controller: controller,
+              autofocus: true,
+            ),
+          ),
+        ),
+      );
+      await tester.enterText(find.byType(EditableText), 'hello');
+      await tester.pump();
+      expect(controller.text, 'hello');
+    });
+
     testWidgets('inherits text style from theme.textTheme.bodyLarge',
         (tester) async {
       final controller = InteractiveTextController(text: 'hello');

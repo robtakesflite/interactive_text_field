@@ -182,6 +182,57 @@ void main() {
     });
   });
 
+  group('TriggerPlugin contract', () {
+    test('multi-char trigger is rejected at construction', () {
+      expect(
+        () => TriggerPlugin<String>(
+          trigger: '//',
+          resolver: (_) => const [],
+          itemBuilder: (_, _, _) => const SizedBox.shrink(),
+        ),
+        throwsArgumentError,
+      );
+    });
+
+    test('empty trigger is rejected at construction', () {
+      expect(
+        () => TriggerPlugin<String>(
+          trigger: '',
+          resolver: (_) => const [],
+          itemBuilder: (_, _, _) => const SizedBox.shrink(),
+        ),
+        throwsArgumentError,
+      );
+    });
+  });
+
+  group('MentionPlugin unicode handles', () {
+    test('non-ASCII letters are valid query characters', () async {
+      final plugin = MentionPlugin(
+        mentions: const [
+          Mention(id: '1', displayName: 'Müller', handle: 'müller'),
+          Mention(id: '2', displayName: '田中', handle: '田中'),
+        ],
+      );
+      final controller = InteractiveTextController(plugins: [plugin]);
+      addTearDown(controller.dispose);
+
+      controller.text = 'hi @mü';
+      controller.selection = const TextSelection.collapsed(offset: 6);
+      await Future<void>.delayed(Duration.zero);
+      expect(plugin.isOpen, isTrue,
+          reason: 'umlaut should not close the trigger');
+      expect(plugin.activeQuery?.query, 'mü');
+
+      controller.text = 'hi @田';
+      controller.selection = const TextSelection.collapsed(offset: 5);
+      await Future<void>.delayed(Duration.zero);
+      expect(plugin.isOpen, isTrue,
+          reason: 'CJK character should not close the trigger');
+      expect(plugin.activeQuery?.query, '田');
+    });
+  });
+
   group('TriggerPlugin async safety', () {
     testWidgets('disposing the controller mid-resolve does not throw',
         (tester) async {

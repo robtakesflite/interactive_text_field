@@ -127,8 +127,19 @@ class TriggerPlugin<T> extends InteractiveTextPlugin {
     this.allowMultipleTriggers = true,
     this.onAccept,
     this.onClose,
-  })  : assert(trigger.length == 1, 'trigger must be a single character'),
-        menuBuilder = menuBuilder ?? _defaultMenuBuilder;
+  }) : menuBuilder = menuBuilder ?? _defaultMenuBuilder {
+    // The detect loop scans backward one UTF-16 code unit at a time,
+    // comparing to the trigger string with `==`. A multi-character or
+    // empty trigger would silently misbehave; throw at construction so
+    // the contract holds in release builds (asserts are stripped).
+    if (trigger.length != 1) {
+      throw ArgumentError.value(
+        trigger,
+        'trigger',
+        'must be exactly one character',
+      );
+    }
+  }
 
   /// The trigger character (e.g. `/`, `@`, `#`).
   final String trigger;

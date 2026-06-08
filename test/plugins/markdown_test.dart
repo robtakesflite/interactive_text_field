@@ -111,6 +111,22 @@ void main() {
       }
     });
 
+    test('emphasis precedence: bold-italic > bold > italic, no overlap', () {
+      // Regression for the perf rewrite of `_overlapsRange` → `_containedIn`:
+      // verify each text region picks exactly one of {bold_italic, bold,
+      // italic} when they would otherwise overlap.
+      const text = 'a ***bi*** b **bold** c *it* d';
+      final ranges = plugin.decorate(_ctx(text)).ranges;
+      final byData = <String, int>{};
+      for (final r in ranges) {
+        final d = r.data;
+        if (d is String) byData[d] = (byData[d] ?? 0) + 1;
+      }
+      expect(byData['bold_italic'], 1);
+      expect(byData['bold'], 1);
+      expect(byData['italic'], 1);
+    });
+
     test('fenced code block with language tag emits syntax tokens', () {
       // `class` is a Dart keyword, `Foo` is matched as a type, `1` as
       // a number — verifies the fenced body is run through the Dart
